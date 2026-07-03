@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>박주환 포트폴리오</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --panel-2: #eef4fb;
+      --text: #172033;
+      --muted: #64748b;
+      --line: #d8e1ec;
+      --accent: #2f8cff;
+      --accent-2: #34c7a1;
+      --shadow: 0 10px 30px rgba(15, 23, 42, .08);
+      --danger: #ef4444;
+      --orange: #f59e0b;
+      --green: #22c55e;
+    }
+
+    html[data-theme="dark"] {
+      --bg: #08111a;
+      --panel: #121c28;
+      --panel-2: #172536;
+      --text: #eef4ff;
+      --muted: #a1afc2;
+      --line: #27384c;
+      --accent: #4da3ff;
+      --accent-2: #5ee0b5;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .25);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      min-height: 100vh;
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 26px 18px;
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 0 8px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: #06121f;
+    }
+
+    .brand h1 { margin: 0; font-size: 20px; letter-spacing: -0.04em; }
+    .brand p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+
+    nav {
+      display: grid;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-weight: 700;
+    }
+
+    nav a:hover,
+    nav a.active {
+      background: var(--panel-2);
+      color: var(--accent);
+    }
+
+    main { padding: 0; }
+
+    header {
+      height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .breadcrumb { font-size: 14px; color: var(--muted); }
+    .breadcrumb strong { color: var(--accent); }
+
+    .theme-toggle {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    section {
+      padding: 34px 42px;
+      scroll-margin-top: 80px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.8fr) minmax(320px, .9fr);
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 26px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      background:
+        radial-gradient(circle at 85% 100%, rgba(47, 140, 255, .18), transparent 36%),
+        var(--panel);
+    }
+
+    .hero .eyebrow {
+      color: var(--accent-2);
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .hero h2 {
+      font-size: clamp(42px, 6vw, 72px);
+      line-height: 1.05;
+      margin: 0 0 18px;
+      letter-spacing: -0.06em;
+    }
+
+    .hero h2 span {
+      color: var(--accent);
+      display: block;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.8;
+      max-width: 880px;
+    }
+
+    .chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .profile-card .big-avatar {
+      width: 92px;
+      height: 92px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      color: #06121f;
+      font-size: 34px;
+      font-weight: 900;
+      margin-bottom: 22px;
+    }
+
+    .profile-card h2 { margin: 0 0 6px; font-size: 30px; }
+    .profile-card .role { color: var(--accent); font-weight: 900; margin-bottom: 18px; }
+
+    .info-list {
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+      display: grid;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .stat .num {
+      color: var(--accent);
+      font-size: 38px;
+      font-weight: 900;
+      margin: 6px 0;
+      letter-spacing: -0.05em;
+    }
+
+    .muted { color: var(--muted); }
+
+    .section-title {
+      font-size: 30px;
+      margin: 0 0 24px;
+      letter-spacing: -0.05em;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .item {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .item h3 { margin: 0 0 8px; font-size: 19px; letter-spacing: -0.03em; }
+    .meta { color: var(--accent); font-weight: 900; font-size: 14px; margin-bottom: 10px; }
+    .item p, .item li, .card p, .card li { color: var(--muted); line-height: 1.75; }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .project-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 315px;
+    }
+
+    .project-card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      letter-spacing: -0.04em;
+    }
+
+    .tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 16px 0;
+    }
+
+    .tag {
+      font-size: 12px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      border: 1px solid var(--line);
+      font-weight: 800;
+    }
+
+    .btn {
+      margin-top: auto;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      color: white;
+      background: var(--accent);
+      padding: 11px 14px;
+      border-radius: 12px;
+      font-weight: 900;
+    }
+
+    .btn:hover { filter: brightness(.95); }
+
+    .focus-box {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      background: var(--panel-2);
+      margin-bottom: 12px;
+    }
+
+    .focus-box h3 {
+      margin: 0 0 8px;
+      font-size: 19px;
+    }
+
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      aside { position: relative; height: auto; }
+      .dashboard-grid, .two-col, .project-grid, .stats { grid-template-columns: 1fr; }
+      section { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <div class="brand">
+        <div class="avatar">JH</div>
+        <div>
+          <h1>박주환</h1>
+          <p>Engineering Portfolio</p>
+        </div>
+      </div>
+
+      <nav>
+        <a class="active" href="#dashboard">📊 대시보드</a>
+        <a href="#profile">👤 프로필</a>
+        <a href="#experience">💼 경험</a>
+        <a href="#projects">🧩 프로젝트</a>
+        <a href="#certifications">🏅 자격증</a>
+        <a href="#education">🎓 학력</a>
+        <a href="#activities">📌 활동</a>
+      </nav>
+    </aside>
+
+    <main>
+      <header>
+        <div class="breadcrumb"><strong>Home</strong> › 대시보드</div>
+        <button class="theme-toggle" id="themeToggle">🌙 다크 모드</button>
+      </header>
+
+      <section id="dashboard">
+        <div class="dashboard-grid">
+          <div class="card hero">
+            <div class="eyebrow">● Data-driven Engineering</div>
+            <h2>전기전자공학 기반의 <span>AI·데이터 분석 포트폴리오</span></h2>
+            <p>
+              전기전자공학 전공 지식과 Python 기반 데이터 분석 경험을 바탕으로 센서 데이터,
+              기상 데이터, 설비 수명 예측 데이터를 다루었습니다. 생성형 AI 도구를 활용한
+              데이터 수집·분석·리포트 자동화 경험을 함께 확장하고 있습니다.
+            </p>
+            <div class="chips">
+              <span class="chip">Electrical & Electronic Engineering</span>
+              <span class="chip">Data Analysis</span>
+              <span class="chip">Machine Learning</span>
+              <span class="chip">Generative AI Workflow</span>
+              <span class="chip">Manufacturing / Equipment Data</span>
+            </div>
+          </div>
+
+          <div class="card profile-card">
+            <div class="big-avatar">박</div>
+            <h2>박주환</h2>
+            <div class="role">Electrical & Data-driven Engineering</div>
+            <div class="info-list">
+              <div>✉️ parkjuehwan@gmail.com</div>
+              <div>📞 010-2089-1643</div>
+              <div>📍 경기도 고양시</div>
+              <div>🎓 한국항공대학교</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="card stat">
+            <div>프로젝트</div>
+            <div class="num">6</div>
+            <div class="muted">HAR, RUL, BMS, Weather ML 등</div>
+          </div>
+          <div class="card stat">
+            <div>경험</div>
+            <div class="num">5</div>
+            <div class="muted">번역·강의·연구·콘텐츠 제작</div>
+          </div>
+          <div class="card stat">
+            <div>자격증</div>
+            <div class="num">4</div>
+            <div class="muted">빅데이터분석기사, ADsP, SQLD, OPIC IH</div>
+          </div>
+          <div class="card stat">
+            <div>전공</div>
+            <div class="num">EE</div>
+            <div class="muted">전기전자공학 / GPA 3.44</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="profile">
+        <h2 class="section-title">프로필</h2>
+        <div class="two-col">
+          <div class="card">
+            <h3>About Me</h3>
+            <p>
+              전기전자공학을 전공하며 회로, 신호, 시스템 기반의 공학 지식을 쌓았습니다.
+              학부연구생과 프로젝트 경험을 통해 NASA C-MAPSS, BMS, 다중 IR 센서 기반 HAR 데이터 등
+              다양한 형태의 데이터를 다루었고, Python과 머신러닝을 활용해 예측·분류 모델을 실험했습니다.
+              최근에는 생성형 AI 도구를 활용한 데이터 수집, 분석, 리포트 생성 자동화에도 관심을 가지고
+              실무형 역량을 확장하고 있습니다.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>지원 방향</h3>
+            <div class="focus-box">
+              <h3>생산·설비 데이터 분석</h3>
+              <p>수명 예측, 이상 징후 탐지, 예방정비 관점의 데이터 활용 역량을 강조할 수 있습니다.</p>
+            </div>
+            <div class="focus-box">
+              <h3>AI 기반 업무 효율화</h3>
+              <p>반복적인 데이터 수집, 정리, 리포트 작업을 자동화하는 실무 보조 역량을 보여줄 수 있습니다.</p>
+            </div>
+            <div class="focus-box">
+              <h3>기술 문서 이해와 전달</h3>
+              <p>LLMOps 기술서 번역 경험을 통해 복잡한 기술 내용을 읽고 구조화하는 능력을 갖추었습니다.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="experience">
+        <h2 class="section-title">경험</h2>
+        <div class="list">
+          <div class="item">
+            <div class="meta">2025.10 – 2026.04</div>
+            <h3>LLMOps 기술서 번역</h3>
+            <p>대규모 언어 모델 운영 및 활용 관련 전문 기술서 한국어 번역에 참여했습니다.</p>
+          </div>
+          <div class="item">
+            <div class="meta">2025.08 – 2025.12</div>
+            <h3>날씨마루 기상기후 빅데이터 분석 플랫폼 머신러닝 콘텐츠 제작</h3>
+            <p>서리 분류 ML 모델과 전력기상지수 예측 ML 모델 교육 콘텐츠 제작에 참여했습니다.</p>
+          </div>
+          <div class="item">
+            <div class="meta">2025.07 – 현재</div>
+            <h3>AI 활용 데이터 수집·분석·시각화 및 업무자동화 보조강사</h3>
+            <p>생성형 AI 도구를 활용한 데이터 수집, 분석, 리포트 생성, 업무자동화 교육을 보조했습니다.</p>
+          </div>
+          <div class="item">
+            <div class="meta">2025.08</div>
+            <h3>파이콘 한국 튜토리얼 보조강사</h3>
+            <p>VSCode MCP를 활용한 영상 정보 수집, DuckDB 저장, 텍스트 분석 및 시각화 실습을 보조했습니다.</p>
+          </div>
+          <div class="item">
+            <div class="meta">2024.09 – 2025.03</div>
+            <h3>학부연구생</h3>
+            <p>NASA C-MAPSS 엔진 RUL 예측 모델과 BMS 데이터 기반 수명 예측 모델 실험을 수행했습니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="projects">
+        <h2 class="section-title">프로젝트</h2>
+        <div class="project-grid">
+          <div class="card project-card">
+            <div class="meta">2024.09 – 2025.07</div>
+            <h3>딥러닝 기반 인간활동인식(HAR)</h3>
+            <p>Raspberry Pi 기반 다중 IR 센서 데이터 수집 시스템을 구축하고 CNN-LSTM 기반 HAR 모델을 실험했습니다.</p>
+            <div class="tags">
+              <span class="tag">Raspberry Pi</span><span class="tag">IR Sensor</span><span class="tag">CNN-LSTM</span>
+            </div>
+            <a class="btn" href="projects/har.html">상세보기</a>
+          </div>
+
+          <div class="card project-card">
+            <div class="meta">2025.08 – 2025.12</div>
+            <h3>날씨마루 서리 분류 ML 모델</h3>
+            <p>기상 관측 데이터를 활용하여 서리 발생 여부를 예측하는 분류 모델 교육 콘텐츠를 제작했습니다.</p>
+            <div class="tags">
+              <span class="tag">Classification</span><span class="tag">FROST</span><span class="tag">Weather Data</span>
+            </div>
+            <a class="btn" href="projects/weather-maru-frost.html">상세보기</a>
+          </div>
+
+          <div class="card project-card">
+            <div class="meta">2025.08 – 2025.12</div>
+            <h3>전력기상지수 예측 ML 모델</h3>
+            <p>기상 요소와 전력 사용량 데이터를 결합해 전력부하합계를 예측하는 회귀 모델 콘텐츠를 제작했습니다.</p>
+            <div class="tags">
+              <span class="tag">Regression</span><span class="tag">Power Demand</span><span class="tag">Time Series</span>
+            </div>
+            <a class="btn" href="projects/weather-index.html">상세보기</a>
+          </div>
+
+          <div class="card project-card">
+            <div class="meta">2024.09 – 2025.03</div>
+            <h3>NASA C-MAPSS 엔진 RUL 예측</h3>
+            <p>엔진 센서 데이터를 활용해 잔여수명 예측 모델을 실험했습니다. 예지보전 관점에서 설비 상태 데이터를 해석한 경험입니다.</p>
+            <div class="tags">
+              <span class="tag">RUL Prediction</span><span class="tag">Predictive Maintenance</span>
+            </div>
+          </div>
+
+          <div class="card project-card">
+            <div class="meta">2024.09 – 2025.03</div>
+            <h3>BMS 데이터 기반 배터리 수명 예측</h3>
+            <p>배터리 관리 시스템 데이터를 기반으로 수명 예측 모델 실험을 수행했습니다.</p>
+            <div class="tags">
+              <span class="tag">BMS</span><span class="tag">Battery Data</span><span class="tag">Life Prediction</span>
+            </div>
+          </div>
+
+          <div class="card project-card">
+            <div class="meta">2025.08</div>
+            <h3>PyCon 영상 데이터 수집·분석 자동화</h3>
+            <p>MCP와 DuckDB를 활용해 역대 PyCon 발표 영상 정보를 수집·저장·분석했습니다.</p>
+            <div class="tags">
+              <span class="tag">MCP</span><span class="tag">DuckDB</span><span class="tag">Text Analysis</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="certifications">
+        <h2 class="section-title">자격증</h2>
+        <div class="project-grid">
+          <div class="item"><h3>빅데이터분석기사</h3><p>데이터 분석 및 모델링 관련 국가기술자격</p></div>
+          <div class="item"><h3>ADsP</h3><p>데이터 분석 준전문가</p></div>
+          <div class="item"><h3>SQLD</h3><p>SQL 개발자</p></div>
+          <div class="item"><h3>OPIC IH</h3><p>영어 말하기 역량</p></div>
+        </div>
+      </section>
+
+      <section id="education">
+        <h2 class="section-title">학력</h2>
+        <div class="item">
+          <div class="meta">2017.03 – 2026.02</div>
+          <h3>한국항공대학교 전기전자공학전공</h3>
+          <p>GPA 3.44 / 4.5</p>
+        </div>
+      </section>
+
+      <section id="activities">
+        <h2 class="section-title">활동</h2>
+        <div class="project-grid">
+          <div class="item"><h3>ESC</h3><p>전자회로 동아리</p></div>
+          <div class="item"><h3>디퍼런트</h3><p>딥러닝 소모임</p></div>
+          <div class="item"><h3>로타랙트</h3><p>봉사 동아리</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const root = document.documentElement;
+    const btn = document.getElementById("themeToggle");
+    btn.addEventListener("click", () => {
+      const current = root.getAttribute("data-theme");
+      const next = current === "light" ? "dark" : "light";
+      root.setAttribute("data-theme", next);
+      btn.textContent = next === "light" ? "🌙 다크 모드" : "☀️ 라이트 모드";
+    });
+
+    const navLinks = Array.from(document.querySelectorAll("nav a"));
+    const sections = navLinks.map(link => document.querySelector(link.getAttribute("href")));
+    window.addEventListener("scroll", () => {
+      let current = 0;
+      sections.forEach((sec, i) => {
+        if (sec && sec.getBoundingClientRect().top < 120) current = i;
+      });
+      navLinks.forEach(a => a.classList.remove("active"));
+      navLinks[current]?.classList.add("active");
+    });
+  </script>
+</body>
+</html>
