@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>전력기상지수 예측 ML 모델 | 박주환 포트폴리오</title>
+  <style>
+:root {
+  --bg: #f4f7fb;
+  --page: #ffffff;
+  --page-soft: #f7fbff;
+  --text: #142033;
+  --muted: #66758a;
+  --line: #d9e3ef;
+  --accent: #1759a6;
+  --accent-2: #21a4b8;
+  --green: #22c55e;
+  --orange: #f59e0b;
+  --red: #ef4444;
+  --shadow: 0 22px 70px rgba(15, 23, 42, .14);
+}
+* { box-sizing: border-box; }
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", Arial, sans-serif;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(33, 164, 184, .18), transparent 32%),
+    radial-gradient(circle at 88% 12%, rgba(23, 89, 166, .16), transparent 30%),
+    linear-gradient(135deg, #f8fbff 0%, #edf4fb 100%);
+  color: var(--text);
+}
+body { display: grid; grid-template-rows: 64px 1fr 72px; }
+.topbar {
+  height: 64px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255,255,255,.82);
+  backdrop-filter: blur(14px);
+  z-index: 10;
+}
+.topbar a { color: var(--accent); text-decoration: none; font-weight: 800; font-size: 14px; }
+.top-title { display: flex; align-items: baseline; gap: 10px; font-weight: 900; letter-spacing: -.02em; }
+.top-title span { color: var(--muted); font-size: 13px; font-weight: 700; }
+.deck { position: relative; width: 100%; height: 100%; padding: 24px 82px; perspective: 1400px; }
+.slide {
+  position: absolute;
+  inset: 24px 82px;
+  display: none;
+  opacity: 0;
+  transform: translateX(34px) rotateY(-4deg) scale(.985);
+  transition: opacity .28s ease, transform .28s ease;
+}
+.slide.active { display: block; opacity: 1; transform: translateX(0) rotateY(0) scale(1); }
+.page {
+  width: 100%;
+  height: 100%;
+  background: var(--page);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+.page-header {
+  padding: 28px 34px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  background: linear-gradient(180deg, #fff, #fbfdff);
+}
+.kicker {
+  color: var(--accent-2);
+  font-weight: 900;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 8px;
+}
+h1, h2, h3, p { margin-top: 0; }
+.page-header h1,
+.page-header h2 {
+  margin: 0;
+  font-size: clamp(28px, 4.2vw, 54px);
+  line-height: 1.06;
+  letter-spacing: -.06em;
+}
+.page-num { color: var(--muted); font-weight: 800; white-space: nowrap; font-size: 13px; }
+.content { padding: 28px 34px 34px; min-height: 0; }
+.hero-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 24px; height: 100%; align-items: stretch; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; height: 100%; }
+.three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.card { background: var(--page-soft); border: 1px solid var(--line); border-radius: 22px; padding: 22px; }
+.card h3 { margin-bottom: 10px; font-size: 21px; letter-spacing: -.03em; }
+.card p, .card li { color: var(--muted); line-height: 1.72; font-size: 15.5px; }
+.lead { color: var(--muted); line-height: 1.78; font-size: 18px; max-width: 980px; }
+.highlight { color: var(--accent); font-weight: 900; }
+.tag-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+.tag {
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: #edf6ff;
+  border: 1px solid #cfe3fb;
+  color: #1759a6;
+  font-size: 13px;
+  font-weight: 800;
+}
+.metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
+.metric { padding: 18px; border-radius: 18px; border: 1px solid var(--line); background: #fff; }
+.metric strong { display: block; color: var(--accent); font-size: 28px; margin-bottom: 6px; }
+.metric span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; align-items: center; margin-top: 28px; }
+.flow-step {
+  position: relative;
+  min-height: 118px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  background: #fff;
+}
+.flow-step:not(:last-child)::after {
+  content: "→";
+  position: absolute;
+  right: -22px;
+  top: 42%;
+  color: var(--accent);
+  font-size: 24px;
+  font-weight: 900;
+  z-index: 2;
+}
+.flow-step h3 { font-size: 16px; margin-bottom: 8px; }
+.flow-step p { color: var(--muted); line-height: 1.55; font-size: 13px; margin: 0; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 16px;
+  font-size: 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+.table th, .table td { padding: 12px 13px; border-bottom: 1px solid var(--line); text-align: left; color: var(--muted); }
+.table th { background: #f1f7ff; color: var(--text); font-weight: 900; }
+.table tr:last-child td { border-bottom: 0; }
+.chart {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 20px;
+  min-height: 270px;
+  display: grid;
+  align-content: end;
+  gap: 12px;
+}
+.bar-chart { display: grid; grid-template-columns: repeat(12, 1fr); gap: 8px; align-items: end; min-height: 170px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.bar { height: var(--h); min-height: 20px; border-radius: 8px 8px 2px 2px; background: linear-gradient(180deg, var(--accent-2), var(--accent)); position: relative; }
+.bar.hot { background: linear-gradient(180deg, #f59e0b, #ef4444); }
+.bar.cold { background: linear-gradient(180deg, #38bdf8, #1759a6); }
+.bar span { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); color: var(--muted); font-size: 11px; font-weight: 800; text-align: center; }
+.result-bars { display: grid; gap: 15px; margin-top: 12px; }
+.bar-row { display: grid; grid-template-columns: 160px 1fr 100px; gap: 14px; align-items: center; font-size: 14px; font-weight: 800; }
+.bar-track { height: 18px; border-radius: 999px; background: #e5eef8; overflow: hidden; border: 1px solid #d3e2f0; }
+.bar-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--accent-2)); width: var(--w); }
+.formula {
+  background: #eef5fc;
+  border: 1px solid #d5e6f5;
+  border-radius: 16px;
+  padding: 18px;
+  font-weight: 900;
+  color: var(--accent);
+  text-align: center;
+  line-height: 1.7;
+  margin: 14px 0;
+}
+.role-list { display: grid; gap: 14px; }
+.role-item { padding: 18px; border-radius: 18px; background: #fff; border: 1px solid var(--line); }
+.role-item strong { display: block; margin-bottom: 8px; font-size: 17px; }
+.role-item span { color: var(--muted); line-height: 1.65; font-size: 14px; }
+.nav-btn {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.88);
+  box-shadow: 0 12px 34px rgba(15,23,42,.14);
+  color: var(--text);
+  font-size: 28px;
+  font-weight: 900;
+  cursor: pointer;
+  z-index: 20;
+}
+.nav-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+.prev { left: 18px; }
+.next { right: 18px; }
+.bottom {
+  height: 72px;
+  padding: 0 28px;
+  display: grid;
+  grid-template-columns: 180px 1fr 180px;
+  align-items: center;
+  gap: 18px;
+  border-top: 1px solid var(--line);
+  background: rgba(255,255,255,.82);
+  backdrop-filter: blur(14px);
+}
+.progress-text { color: var(--muted); font-size: 13px; font-weight: 800; }
+.dots { display: flex; justify-content: center; gap: 7px; flex-wrap: wrap; }
+.dot { width: 9px; height: 9px; border: 0; border-radius: 999px; background: #c8d6e6; cursor: pointer; padding: 0; }
+.dot.active { width: 28px; background: var(--accent); }
+.hint { color: var(--muted); font-size: 12px; text-align: right; font-weight: 700; }
+@media (max-width: 900px) {
+  body { grid-template-rows: 58px 1fr 66px; }
+  .deck { padding: 14px 58px; }
+  .slide { inset: 14px 58px; }
+  .page-header, .content { padding-left: 22px; padding-right: 22px; }
+  .hero-grid, .two-col, .three-col { grid-template-columns: 1fr; }
+  .metric-grid { grid-template-columns: repeat(2, 1fr); }
+  .flow { grid-template-columns: 1fr; }
+  .flow-step:not(:last-child)::after { display: none; }
+  .bar-row { grid-template-columns: 110px 1fr 70px; }
+  .page { overflow: hidden; }
+  .card p, .card li, .lead { font-size: 14px; }
+  .bottom { grid-template-columns: 1fr; height: auto; min-height: 66px; }
+  .progress-text, .hint { display: none; }
+}
+@media print {
+  html, body { overflow: visible; height: auto; display: block; background: #fff; }
+  .topbar, .bottom, .nav-btn { display: none; }
+  .deck { padding: 0; perspective: none; }
+  .slide { position: relative; inset: auto; display: block !important; opacity: 1 !important; transform: none !important; page-break-after: always; height: 100vh; padding: 20px; }
+  .page { box-shadow: none; }
+}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="../index.html#projects" id="backLink">← 메인으로 돌아가기</a>
+    <div class="top-title">전력기상지수 예측 ML 모델 <span>초급·중급 자료 통합 / 페이지 넘김형</span></div>
+    <a href="#" id="printBtn">PDF로 인쇄</a>
+  </div>
+
+  <button class="nav-btn prev" id="prevBtn" aria-label="이전 페이지">‹</button>
+  <button class="nav-btn next" id="nextBtn" aria-label="다음 페이지">›</button>
+
+  <main class="deck" id="deck">
+    
+    <section class="slide active">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Project Overview</div>
+            <h2>전력기상지수 회귀 분석환경<br>전력 수요 예측 모델</h2>
+          </div>
+          <div class="page-num">01 / 14</div>
+        </div>
+        <div class="content">
+          
+<div class="hero-grid">
+  <div>
+    <p class="lead">
+      기상 요인과 시간 정보를 활용하여 시간대별 <span class="highlight">전력부하합계</span>를 예측하는 회귀 프로젝트입니다.
+      초급 자료의 AutoML 회귀 시연과 중급 자료의 Python 기반 시계열 회귀 분석을 통합해 정리했습니다.
+    </p>
+    <div class="tag-row">
+      <span class="tag">Power Demand Forecasting</span><span class="tag">Weather Data</span><span class="tag">Regression</span>
+      <span class="tag">Random Forest Regressor</span><span class="tag">Time Series</span>
+    </div>
+  </div>
+  <div class="card">
+    <h3>핵심 지표</h3>
+    <div class="metric-grid" style="grid-template-columns: repeat(2,1fr);">
+      <div class="metric"><strong>600,674</strong><span>분석 데이터 행 수</span></div>
+      <div class="metric"><strong>14 → 28</strong><span>특성 공학 후 변수 확장</span></div>
+      <div class="metric"><strong>0.9657</strong><span>Random Forest R²</span></div>
+      <div class="metric"><strong>7.63%</strong><span>Random Forest MAPE</span></div>
+    </div>
+  </div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Scenario</div>
+            <h2>분석 시나리오</h2>
+          </div>
+          <div class="page-num">02 / 14</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>입력 데이터</h3>
+    <ul>
+      <li><b>기상 데이터</b>: 기온, 상대습도, 풍속 등</li>
+      <li><b>전력 데이터</b>: 과거 전력 사용량, 계약전력합계, 공동주택수</li>
+      <li><b>시간 정보</b>: 연도, 월, 일, 시, 요일</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>예측 목표</h3>
+    <p>
+      격자 내 해당 시각의 전력부하합계(kWh)를 예측합니다.
+      전력망 안정 운영, 수요 예측, 기상 기반 예측 인덱스 산출에 활용될 수 있는 시계열 회귀 문제입니다.
+    </p>
+  </div>
+</div>
+<div class="flow">
+  <div class="flow-step"><h3>데이터 로딩</h3><p>전력·기상 데이터 준비</p></div>
+  <div class="flow-step"><h3>전처리</h3><p>시계열 변환·결측치 처리</p></div>
+  <div class="flow-step"><h3>특성 공학</h3><p>주기성·파생·lag 변수</p></div>
+  <div class="flow-step"><h3>모델 학습</h3><p>4개 회귀 모델 비교</p></div>
+  <div class="flow-step"><h3>검증</h3><p>변수 중요도·예측 성능</p></div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Beginner + Intermediate</div>
+            <h2>AutoML 회귀와 코드 기반 모델링</h2>
+          </div>
+          <div class="page-num">03 / 14</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>초급 자료: AutoML 회귀</h3>
+    <ul>
+      <li>데이터 업로드 후 AutoML 실행 메뉴에서 회귀 모델 선택</li>
+      <li>분석 파일로 kepco_ml_60k.csv 사용</li>
+      <li>타깃 컬럼을 전력부하합계, 또는 power_load_sum으로 지정</li>
+      <li>RMSE, MAE 등 회귀 지표를 대시보드에서 확인</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>중급 자료: Python 분석</h3>
+    <ul>
+      <li>600k 규모 데이터를 로딩하고 구조 및 결측치 확인</li>
+      <li>datetime 변환, ffill, sin/cos, lag/rolling 특성 생성</li>
+      <li>Linear/Ridge/Random Forest/Gradient Boosting 모델 비교</li>
+      <li>TimeSeriesSplit으로 일반화 성능 검증</li>
+    </ul>
+  </div>
+</div>
+<div class="card" style="margin-top:18px;">
+  <h3>포트폴리오 관점</h3>
+  <p>전력 수요 예측이라는 회귀 문제를 단순 모델 실행이 아니라, 시간 특성 설계와 모델 검증 흐름까지 보여주는 사례로 정리했습니다.</p>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Data</div>
+            <h2>전력기상지수 데이터 구조</h2>
+          </div>
+          <div class="page-num">04 / 14</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>변수 카테고리</h3>
+    <table class="table">
+      <tr><th>카테고리</th><th>주요 변수</th></tr>
+      <tr><td>위치 정보</td><td>X격자, Y격자, 위도, 경도</td></tr>
+      <tr><td>시간 정보</td><td>연도, 월, 일, 시</td></tr>
+      <tr><td>전력 정보</td><td>계약전력합계, 공동주택수, 전력부하합계</td></tr>
+      <tr><td>기상 정보</td><td>기온, 상대습도, 풍속</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h3>타깃과 입력 변수</h3>
+    <ul>
+      <li><b>타깃</b>: 전력부하합계(kWh)</li>
+      <li><b>설명 변수</b>: 시간, 위치, 계약전력, 공동주택 수, 기상 관측값</li>
+      <li>전력 수요는 기상·생활 패턴·설비 규모의 영향을 함께 받기 때문에 특성 공학이 중요합니다.</li>
+    </ul>
+  </div>
+</div>
+<div class="metric-grid">
+  <div class="metric"><strong>kWh</strong><span>전력부하합계 단위</span></div>
+  <div class="metric"><strong>℃</strong><span>기온</span></div>
+  <div class="metric"><strong>%</strong><span>상대습도</span></div>
+  <div class="metric"><strong>m/s</strong><span>풍속</span></div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Loading</div>
+            <h2>데이터 로딩과 구조 확인</h2>
+          </div>
+          <div class="page-num">05 / 14</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>분석 환경</h3>
+    <ul>
+      <li>pandas, numpy로 데이터 처리</li>
+      <li>matplotlib, seaborn으로 시각화</li>
+      <li>scikit-learn으로 회귀 모델 학습 및 평가</li>
+      <li>Jupyter Notebook 환경에서 실습 흐름 구성</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>데이터 규모와 결측치</h3>
+    <table class="table">
+      <tr><th>항목</th><th>결과</th></tr>
+      <tr><td>총 행 수</td><td>600,674개</td></tr>
+      <tr><td>총 컬럼 수</td><td>14개</td></tr>
+      <tr><td>기온 결측</td><td>38,725개</td></tr>
+      <tr><td>상대습도 결측</td><td>91,035개</td></tr>
+      <tr><td>풍속 결측</td><td>39,697개</td></tr>
+    </table>
+  </div>
+</div>
+<div class="card" style="margin-top:18px;">
+  <h3>해석</h3>
+  <p>기상 변수 결측치가 존재하므로, 시계열 특성을 고려한 전처리 방식을 적용해야 합니다.</p>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Preprocessing</div>
+            <h2>시계열 변환과 결측치 처리</h2>
+          </div>
+          <div class="page-num">06 / 14</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>datetime 인덱스 생성</h3>
+    <p>연도, 월, 일, 시 컬럼을 하나의 datetime 형식으로 통합했습니다. 24시는 0시로 변환하고, 생성한 datetime을 인덱스로 설정했습니다.</p>
+    <div class="formula">연도 + 월 + 일 + 시 → datetime index</div>
+  </div>
+  <div class="card">
+    <h3>Forward Fill 결측치 처리</h3>
+    <p>기온, 상대습도, 풍속은 시간적으로 완만하게 변화하는 기상 변수라는 점을 고려해 바로 이전 시점의 값을 채우는 ffill 방식을 적용했습니다.</p>
+    <div class="formula">missing weather value → previous time value</div>
+  </div>
+</div>
+<div class="flow">
+  <div class="flow-step"><h3>원본 컬럼</h3><p>연도·월·일·시</p></div>
+  <div class="flow-step"><h3>시간 보정</h3><p>24시 → 0시</p></div>
+  <div class="flow-step"><h3>datetime 생성</h3><p>표준 시간 형식</p></div>
+  <div class="flow-step"><h3>인덱스 설정</h3><p>시계열 기준</p></div>
+  <div class="flow-step"><h3>ffill</h3><p>기상 결측치 보완</p></div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Feature Engineering</div>
+            <h2>특성 공학: 시간·기상·과거 정보 반영</h2>
+          </div>
+          <div class="page-num">07 / 14</div>
+        </div>
+        <div class="content">
+          
+<div class="three-col">
+  <div class="card"><h3>주기성 변환</h3><p>시와 월은 순환 변수이므로 sin/cos 변환을 적용해 시간의 순환적 특성을 모델이 학습하도록 했습니다.</p></div>
+  <div class="card"><h3>파생 변수</h3><p>주말 여부, 냉방도일, 난방도일, 불쾌지수를 생성해 생활 패턴과 기상 조건을 반영했습니다.</p></div>
+  <div class="card"><h3>Lag / Rolling</h3><p>24시간 전, 168시간 전 전력부하와 기온, 최근 24시간 평균 기온을 추가했습니다.</p></div>
+</div>
+<div class="card" style="margin-top:18px;">
+  <h3>불쾌지수</h3>
+  <div class="formula">불쾌지수 = 1.8 × 기온 − 0.55 × (1 − 상대습도 / 100) × (1.8 × 기온 − 26) + 32</div>
+  <p>특성 공학 후 모델 입력 변수는 기존 14개에서 28개로 확장되었습니다.</p>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">EDA</div>
+            <h2>데이터 탐색: 분포와 시계열 패턴</h2>
+          </div>
+          <div class="page-num">08 / 14</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>분포 분석</h3>
+    <ul>
+      <li>공간 정보는 특정 지역에 집중되는 경향이 있습니다.</li>
+      <li>연도, 월, 일, 시는 비교적 균등한 분포를 보입니다.</li>
+      <li>전력 관련 변수는 오른쪽으로 긴 꼬리를 가진 분포입니다.</li>
+      <li>기온은 -23.7℃에서 37.7℃까지 나타나 겨울과 여름 특성을 반영합니다.</li>
+    </ul>
+  </div>
+  <div class="chart">
+    <h3>전력 변수의 우측 편향 예시</h3>
+    <div class="bar-chart" style="grid-template-columns: repeat(10,1fr);">
+      <div class="bar" style="--h:150px"><span>1</span></div><div class="bar" style="--h:122px"><span>2</span></div>
+      <div class="bar" style="--h:92px"><span>3</span></div><div class="bar" style="--h:70px"><span>4</span></div>
+      <div class="bar" style="--h:50px"><span>5</span></div><div class="bar" style="--h:38px"><span>6</span></div>
+      <div class="bar" style="--h:31px"><span>7</span></div><div class="bar" style="--h:25px"><span>8</span></div>
+      <div class="bar" style="--h:21px"><span>9</span></div><div class="bar" style="--h:18px"><span>10</span></div>
+    </div>
+    <p>전력부하합계는 평균이 중앙값보다 크고 일부 큰 값이 존재하여 분포 확인이 중요합니다.</p>
+  </div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Seasonality</div>
+            <h2>월별·시간대별 전력 사용 패턴</h2>
+          </div>
+          <div class="page-num">09 / 14</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="chart">
+    <h3>월별 평균 전력부하: 계절성</h3>
+    <div class="bar-chart">
+      <div class="bar cold" style="--h:145px"><span>1</span></div><div class="bar" style="--h:120px"><span>2</span></div>
+      <div class="bar" style="--h:92px"><span>3</span></div><div class="bar" style="--h:70px"><span>4</span></div>
+      <div class="bar" style="--h:62px"><span>5</span></div><div class="bar hot" style="--h:104px"><span>6</span></div>
+      <div class="bar hot" style="--h:154px"><span>7</span></div><div class="bar hot" style="--h:160px"><span>8</span></div>
+      <div class="bar" style="--h:112px"><span>9</span></div><div class="bar" style="--h:78px"><span>10</span></div>
+      <div class="bar" style="--h:104px"><span>11</span></div><div class="bar cold" style="--h:140px"><span>12</span></div>
+    </div>
+    <p>여름철과 겨울철에 전력 사용량이 높아지는 계절성이 나타납니다.</p>
+  </div>
+  <div class="card">
+    <h3>시간대별 패턴</h3>
+    <ul>
+      <li>아침 시간대와 저녁 시간대에 전력 사용량이 높아지는 경향이 있습니다.</li>
+      <li>공동주택의 생활 패턴이 전력 수요에 반영됩니다.</li>
+      <li>따라서 시간 변수는 주기성 변환을 통해 학습시키는 것이 유리합니다.</li>
+    </ul>
+    <div class="formula">시간 정보 + 기상 정보 + 과거 부하 → 전력 수요 예측</div>
+  </div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Modeling</div>
+            <h2>비교 모델 학습 및 평가</h2>
+          </div>
+          <div class="page-num">10 / 14</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>비교 모델</h3>
+    <ul>
+      <li>Linear Regression</li>
+      <li>Ridge Regression</li>
+      <li>Random Forest Regressor</li>
+      <li>Gradient Boosting Regressor</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>평가지표</h3>
+    <table class="table">
+      <tr><th>지표</th><th>의미</th></tr>
+      <tr><td>R²</td><td>모델이 데이터 변화를 설명하는 정도</td></tr>
+      <tr><td>RMSE</td><td>예측값과 실제값의 평균 오차 크기</td></tr>
+      <tr><td>MAPE</td><td>평균 오차를 백분율로 표현한 값</td></tr>
+    </table>
+  </div>
+</div>
+<div class="card" style="margin-top:18px;">
+  <h3>모델링 해석</h3>
+  <p>전력 수요는 비선형 관계와 변수 간 상호작용이 강하므로, 선형 모델뿐 아니라 트리 기반 앙상블 모델을 함께 비교했습니다.</p>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Result</div>
+            <h2>모델별 성능 비교 결과</h2>
+          </div>
+          <div class="page-num">11 / 14</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>성능표</h3>
+    <table class="table">
+      <tr><th>Model</th><th>R²</th><th>RMSE</th><th>MAPE</th></tr>
+      <tr><td><b>Random Forest</b></td><td><b>0.965710</b></td><td><b>1392.824073</b></td><td><b>7.629671</b></td></tr>
+      <tr><td>Gradient Boosting</td><td>0.947662</td><td>1720.756181</td><td>15.442730</td></tr>
+      <tr><td>Linear Regression</td><td>0.862323</td><td>2790.884991</td><td>30.322476</td></tr>
+      <tr><td>Ridge</td><td>0.862319</td><td>2790.922717</td><td>30.297387</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h3>R² 비교</h3>
+    <div class="result-bars">
+      <div class="bar-row"><span>Random Forest</span><div class="bar-track"><div class="bar-fill" style="--w:96.57%"></div></div><span>0.9657</span></div>
+      <div class="bar-row"><span>Gradient Boosting</span><div class="bar-track"><div class="bar-fill" style="--w:94.77%"></div></div><span>0.9477</span></div>
+      <div class="bar-row"><span>Linear Regression</span><div class="bar-track"><div class="bar-fill" style="--w:86.23%"></div></div><span>0.8623</span></div>
+      <div class="bar-row"><span>Ridge</span><div class="bar-track"><div class="bar-fill" style="--w:86.23%"></div></div><span>0.8623</span></div>
+    </div>
+  </div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Validation</div>
+            <h2>시계열 교차검증으로 안정성 확인</h2>
+          </div>
+          <div class="page-num">12 / 14</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>TimeSeriesSplit</h3>
+    <p>
+      단순 8:2 분할은 마지막 20% 구간의 난이도에 성능이 좌우될 수 있습니다.
+      따라서 시간 순서를 유지한 채 여러 Fold로 나누고, 과거 데이터로 다음 미래 구간을 예측하는 시계열 교차검증을 적용했습니다.
+    </p>
+  </div>
+  <div class="card">
+    <h3>교차검증 결과</h3>
+    <table class="table">
+      <tr><th>Model</th><th>R²</th><th>RMSE</th><th>MAPE</th></tr>
+      <tr><td><b>Random Forest</b></td><td><b>0.9441</b></td><td><b>1925.6306</b></td><td><b>10.78</b></td></tr>
+      <tr><td>Gradient Boosting</td><td>0.9351</td><td>2105.2491</td><td>15.19</td></tr>
+      <tr><td>Linear Regression</td><td>0.8731</td><td>2946.5507</td><td>29.8</td></tr>
+      <tr><td>Ridge</td><td>0.8736</td><td>2940.9298</td><td>29.52</td></tr>
+    </table>
+  </div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Feature Importance</div>
+            <h2>최종 모델과 변수 중요도</h2>
+          </div>
+          <div class="page-num">13 / 14</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>최종 모델</h3>
+    <ul>
+      <li>Random Forest Regressor를 최종 모델로 선정</li>
+      <li>R², RMSE, MAPE에서 가장 우수한 성능</li>
+      <li>비선형 관계와 변수 간 상호작용을 효과적으로 반영</li>
+      <li>변수 중요도 분석을 통해 예측 근거 해석 가능</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>중요 변수 해석</h3>
+    <div class="result-bars">
+      <div class="bar-row"><span>계약전력합계</span><div class="bar-track"><div class="bar-fill" style="--w:92%"></div></div><span>Top</span></div>
+      <div class="bar-row"><span>시간_sin/cos</span><div class="bar-track"><div class="bar-fill" style="--w:76%"></div></div><span>High</span></div>
+      <div class="bar-row"><span>기온_rolling_24h</span><div class="bar-track"><div class="bar-fill" style="--w:68%"></div></div><span>High</span></div>
+      <div class="bar-row"><span>불쾌지수</span><div class="bar-track"><div class="bar-fill" style="--w:60%"></div></div><span>High</span></div>
+    </div>
+  </div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Portfolio Value</div>
+            <h2>수행 역량과 직무 연결점</h2>
+          </div>
+          <div class="page-num">14 / 14</div>
+        </div>
+        <div class="content">
+          
+<div class="role-list">
+  <div class="role-item"><strong>1. 시계열 회귀 문제 구조화</strong><span>전력 수요 예측을 시간·기상·전력 변수의 복합 문제로 정의하고, 데이터 로딩부터 검증까지 분석 흐름을 정리했습니다.</span></div>
+  <div class="role-item"><strong>2. 특성 공학 설계</strong><span>sin/cos 주기성, 냉·난방도일, 불쾌지수, lag, rolling 등 도메인 기반 변수를 생성했습니다.</span></div>
+  <div class="role-item"><strong>3. 모델 비교와 검증</strong><span>4개 회귀 모델을 R²·RMSE·MAPE 기준으로 비교하고, TimeSeriesSplit으로 일반화 성능을 확인했습니다.</span></div>
+  <div class="role-item"><strong>4. 제조·설비 데이터 확장성</strong><span>전력·기상 시계열 분석 경험은 생산설비 에너지 사용량 예측, 부하 변동 분석, 운영 효율화 과제로 확장 가능합니다.</span></div>
+</div>
+
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="bottom">
+    <div class="progress-text" id="progressText">01 / 14</div>
+    <div class="dots" id="dots"></div>
+    <div class="hint">← / → 키 또는 좌우 버튼으로 이동</div>
+  </footer>
+
+  <script>
+const slides = Array.from(document.querySelectorAll(".slide"));
+const dotsWrap = document.getElementById("dots");
+const progressText = document.getElementById("progressText");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const printBtn = document.getElementById("printBtn");
+const backLink = document.getElementById("backLink");
+let current = 0;
+let wheelLocked = false;
+
+if (!location.pathname.includes("/projects/")) {
+  backLink.setAttribute("href", "index.html#projects");
+}
+
+slides.forEach((_, i) => {
+  const dot = document.createElement("button");
+  dot.className = "dot";
+  dot.setAttribute("aria-label", `${i + 1}번 페이지로 이동`);
+  dot.addEventListener("click", () => showSlide(i));
+  dotsWrap.appendChild(dot);
+});
+
+const dots = Array.from(document.querySelectorAll(".dot"));
+function pad(n) { return String(n).padStart(2, "0"); }
+
+function showSlide(index) {
+  if (index < 0) index = 0;
+  if (index >= slides.length) index = slides.length - 1;
+  slides[current].classList.remove("active");
+  dots[current].classList.remove("active");
+  current = index;
+  slides[current].classList.add("active");
+  dots[current].classList.add("active");
+  progressText.textContent = `${pad(current + 1)} / ${slides.length}`;
+  prevBtn.style.opacity = current === 0 ? ".35" : "1";
+  nextBtn.style.opacity = current === slides.length - 1 ? ".35" : "1";
+}
+function next() { showSlide(current + 1); }
+function prev() { showSlide(current - 1); }
+
+prevBtn.addEventListener("click", prev);
+nextBtn.addEventListener("click", next);
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") next();
+  if (e.key === "ArrowLeft" || e.key === "PageUp") prev();
+  if (e.key === "Home") showSlide(0);
+  if (e.key === "End") showSlide(slides.length - 1);
+});
+
+document.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  if (wheelLocked) return;
+  wheelLocked = true;
+  if (e.deltaY > 0) next();
+  if (e.deltaY < 0) prev();
+  setTimeout(() => wheelLocked = false, 520);
+}, { passive: false });
+
+printBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  window.print();
+});
+
+showSlide(0);
+</script>
+</body>
+</html>

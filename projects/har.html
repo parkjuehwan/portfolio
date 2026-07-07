@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HAR 프로젝트 | 박주환 포트폴리오</title>
+  <style>
+:root {
+  --bg: #f4f7fb;
+  --page: #ffffff;
+  --page-soft: #f7fbff;
+  --text: #142033;
+  --muted: #66758a;
+  --line: #d9e3ef;
+  --accent: #1759a6;
+  --accent-2: #21a4b8;
+  --green: #22c55e;
+  --orange: #f59e0b;
+  --red: #ef4444;
+  --shadow: 0 22px 70px rgba(15, 23, 42, .14);
+}
+* { box-sizing: border-box; }
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", Arial, sans-serif;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(33, 164, 184, .18), transparent 32%),
+    radial-gradient(circle at 88% 12%, rgba(23, 89, 166, .16), transparent 30%),
+    linear-gradient(135deg, #f8fbff 0%, #edf4fb 100%);
+  color: var(--text);
+}
+body { display: grid; grid-template-rows: 64px 1fr 72px; }
+.topbar {
+  height: 64px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255,255,255,.82);
+  backdrop-filter: blur(14px);
+  z-index: 10;
+}
+.topbar a { color: var(--accent); text-decoration: none; font-weight: 800; font-size: 14px; }
+.top-title { display: flex; align-items: baseline; gap: 10px; font-weight: 900; letter-spacing: -.02em; }
+.top-title span { color: var(--muted); font-size: 13px; font-weight: 700; }
+.deck { position: relative; width: 100%; height: 100%; padding: 24px 82px; perspective: 1400px; }
+.slide {
+  position: absolute;
+  inset: 24px 82px;
+  display: none;
+  opacity: 0;
+  transform: translateX(34px) rotateY(-4deg) scale(.985);
+  transition: opacity .28s ease, transform .28s ease;
+}
+.slide.active { display: block; opacity: 1; transform: translateX(0) rotateY(0) scale(1); }
+.page {
+  width: 100%;
+  height: 100%;
+  background: var(--page);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+.page-header {
+  padding: 28px 34px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  background: linear-gradient(180deg, #fff, #fbfdff);
+}
+.kicker {
+  color: var(--accent-2);
+  font-weight: 900;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 8px;
+}
+h1, h2, h3, p { margin-top: 0; }
+.page-header h1,
+.page-header h2 {
+  margin: 0;
+  font-size: clamp(28px, 4.2vw, 54px);
+  line-height: 1.06;
+  letter-spacing: -.06em;
+}
+.page-num { color: var(--muted); font-weight: 800; white-space: nowrap; font-size: 13px; }
+.content { padding: 28px 34px 34px; min-height: 0; }
+.hero-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 24px; height: 100%; align-items: stretch; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; height: 100%; }
+.three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.card { background: var(--page-soft); border: 1px solid var(--line); border-radius: 22px; padding: 22px; }
+.card h3 { margin-bottom: 10px; font-size: 21px; letter-spacing: -.03em; }
+.card p, .card li { color: var(--muted); line-height: 1.72; font-size: 15.5px; }
+.lead { color: var(--muted); line-height: 1.78; font-size: 18px; max-width: 980px; }
+.highlight { color: var(--accent); font-weight: 900; }
+.tag-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+.tag {
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: #edf6ff;
+  border: 1px solid #cfe3fb;
+  color: #1759a6;
+  font-size: 13px;
+  font-weight: 800;
+}
+.metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
+.metric { padding: 18px; border-radius: 18px; border: 1px solid var(--line); background: #fff; }
+.metric strong { display: block; color: var(--accent); font-size: 28px; margin-bottom: 6px; }
+.metric span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; align-items: center; margin-top: 28px; }
+.flow-step {
+  position: relative;
+  min-height: 118px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  background: #fff;
+}
+.flow-step:not(:last-child)::after {
+  content: "→";
+  position: absolute;
+  right: -22px;
+  top: 42%;
+  color: var(--accent);
+  font-size: 24px;
+  font-weight: 900;
+  z-index: 2;
+}
+.flow-step h3 { font-size: 16px; margin-bottom: 8px; }
+.flow-step p { color: var(--muted); line-height: 1.55; font-size: 13px; margin: 0; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 16px;
+  font-size: 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+.table th, .table td { padding: 12px 13px; border-bottom: 1px solid var(--line); text-align: left; color: var(--muted); }
+.table th { background: #f1f7ff; color: var(--text); font-weight: 900; }
+.table tr:last-child td { border-bottom: 0; }
+.chart {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 20px;
+  min-height: 270px;
+  display: grid;
+  align-content: end;
+  gap: 12px;
+}
+.bar-chart { display: grid; grid-template-columns: repeat(12, 1fr); gap: 8px; align-items: end; min-height: 170px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.bar { height: var(--h); min-height: 20px; border-radius: 8px 8px 2px 2px; background: linear-gradient(180deg, var(--accent-2), var(--accent)); position: relative; }
+.bar.hot { background: linear-gradient(180deg, #f59e0b, #ef4444); }
+.bar.cold { background: linear-gradient(180deg, #38bdf8, #1759a6); }
+.bar span { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); color: var(--muted); font-size: 11px; font-weight: 800; text-align: center; }
+.result-bars { display: grid; gap: 15px; margin-top: 12px; }
+.bar-row { display: grid; grid-template-columns: 160px 1fr 100px; gap: 14px; align-items: center; font-size: 14px; font-weight: 800; }
+.bar-track { height: 18px; border-radius: 999px; background: #e5eef8; overflow: hidden; border: 1px solid #d3e2f0; }
+.bar-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--accent-2)); width: var(--w); }
+.formula {
+  background: #eef5fc;
+  border: 1px solid #d5e6f5;
+  border-radius: 16px;
+  padding: 18px;
+  font-weight: 900;
+  color: var(--accent);
+  text-align: center;
+  line-height: 1.7;
+  margin: 14px 0;
+}
+.role-list { display: grid; gap: 14px; }
+.role-item { padding: 18px; border-radius: 18px; background: #fff; border: 1px solid var(--line); }
+.role-item strong { display: block; margin-bottom: 8px; font-size: 17px; }
+.role-item span { color: var(--muted); line-height: 1.65; font-size: 14px; }
+.nav-btn {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.88);
+  box-shadow: 0 12px 34px rgba(15,23,42,.14);
+  color: var(--text);
+  font-size: 28px;
+  font-weight: 900;
+  cursor: pointer;
+  z-index: 20;
+}
+.nav-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+.prev { left: 18px; }
+.next { right: 18px; }
+.bottom {
+  height: 72px;
+  padding: 0 28px;
+  display: grid;
+  grid-template-columns: 180px 1fr 180px;
+  align-items: center;
+  gap: 18px;
+  border-top: 1px solid var(--line);
+  background: rgba(255,255,255,.82);
+  backdrop-filter: blur(14px);
+}
+.progress-text { color: var(--muted); font-size: 13px; font-weight: 800; }
+.dots { display: flex; justify-content: center; gap: 7px; flex-wrap: wrap; }
+.dot { width: 9px; height: 9px; border: 0; border-radius: 999px; background: #c8d6e6; cursor: pointer; padding: 0; }
+.dot.active { width: 28px; background: var(--accent); }
+.hint { color: var(--muted); font-size: 12px; text-align: right; font-weight: 700; }
+@media (max-width: 900px) {
+  body { grid-template-rows: 58px 1fr 66px; }
+  .deck { padding: 14px 58px; }
+  .slide { inset: 14px 58px; }
+  .page-header, .content { padding-left: 22px; padding-right: 22px; }
+  .hero-grid, .two-col, .three-col { grid-template-columns: 1fr; }
+  .metric-grid { grid-template-columns: repeat(2, 1fr); }
+  .flow { grid-template-columns: 1fr; }
+  .flow-step:not(:last-child)::after { display: none; }
+  .bar-row { grid-template-columns: 110px 1fr 70px; }
+  .page { overflow: hidden; }
+  .card p, .card li, .lead { font-size: 14px; }
+  .bottom { grid-template-columns: 1fr; height: auto; min-height: 66px; }
+  .progress-text, .hint { display: none; }
+}
+@media print {
+  html, body { overflow: visible; height: auto; display: block; background: #fff; }
+  .topbar, .bottom, .nav-btn { display: none; }
+  .deck { padding: 0; perspective: none; }
+  .slide { position: relative; inset: auto; display: block !important; opacity: 1 !important; transform: none !important; page-break-after: always; height: 100vh; padding: 20px; }
+  .page { box-shadow: none; }
+}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="../index.html#projects" id="backLink">← 메인으로 돌아가기</a>
+    <div class="top-title">HAR 프로젝트 <span>페이지 넘김형 상세 페이지</span></div>
+    <a href="#" id="printBtn">PDF로 인쇄</a>
+  </div>
+
+  <button class="nav-btn prev" id="prevBtn" aria-label="이전 페이지">‹</button>
+  <button class="nav-btn next" id="nextBtn" aria-label="다음 페이지">›</button>
+
+  <main class="deck" id="deck">
+    
+    <section class="slide active">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Project Overview</div>
+            <h2>딥러닝 기반 저해상도 IR 센서 HAR</h2>
+          </div>
+          <div class="page-num">01 / 11</div>
+        </div>
+        <div class="content">
+          
+<div class="hero-grid">
+  <div>
+    <p class="lead">
+      저해상도 적외선(IR) 센서 데이터를 활용해 사람의 자세와 동작을 인식하는
+      <span class="highlight">Human Activity Recognition</span> 프로젝트입니다.
+      단일 프레임 기반 CNN과 연속 시퀀스 기반 CNN-LSTM을 비교하여,
+      해상도 저하가 인식 성능에 미치는 영향을 분석했습니다.
+    </p>
+    <div class="tag-row">
+      <span class="tag">Human Activity Recognition</span><span class="tag">Low-resolution IR Sensor</span>
+      <span class="tag">CNN</span><span class="tag">CNN-LSTM</span><span class="tag">Raspberry Pi</span>
+    </div>
+  </div>
+  <div class="card">
+    <h3>프로젝트 핵심</h3>
+    <div class="metric-grid" style="grid-template-columns: repeat(2,1fr);">
+      <div class="metric"><strong>2</strong><span>데이터 유형<br>Data C / Data H</span></div>
+      <div class="metric"><strong>4</strong><span>해상도 조건</span></div>
+      <div class="metric"><strong>30,000</strong><span>정적 IR 이미지</span></div>
+      <div class="metric"><strong>450</strong><span>연속 시퀀스 데이터</span></div>
+    </div>
+  </div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Problem</div>
+            <h2>왜 저해상도 IR 센서인가?</h2>
+          </div>
+          <div class="page-num">02 / 11</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>기존 RGB/고해상도 영상의 한계</h3>
+    <ul>
+      <li>고해상도 RGB 영상은 인식 정확도는 높지만 개인 식별 가능성이 큽니다.</li>
+      <li>병실, 화장실, 독거노인 주거공간처럼 사생활 보호가 중요한 공간에 적용하기 어렵습니다.</li>
+      <li>조도가 낮은 환경에서는 영상 기반 인식 성능이 저하될 수 있습니다.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>저해상도 IR 센서의 가능성</h3>
+    <ul>
+      <li>비가시광 열 정보를 사용해 조명 환경의 영향을 줄일 수 있습니다.</li>
+      <li>극저해상도에서는 인체 세부 식별이 어려워 사생활 보호에 유리합니다.</li>
+      <li>다만 공간 정보가 크게 줄어들어 인식 정확도 저하 문제가 발생합니다.</li>
+    </ul>
+  </div>
+</div>
+<div class="flow">
+  <div class="flow-step"><h3>사회적 수요</h3><p>고령자 모니터링, 낙상 감지</p></div>
+  <div class="flow-step"><h3>개인정보 이슈</h3><p>고해상도 영상의 식별 가능성</p></div>
+  <div class="flow-step"><h3>IR 센서 대안</h3><p>열 분포 기반 비식별 데이터</p></div>
+  <div class="flow-step"><h3>저해상도 문제</h3><p>공간 정보 손실</p></div>
+  <div class="flow-step"><h3>모델 비교</h3><p>CNN과 CNN-LSTM 분석</p></div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Goal</div>
+            <h2>연구 목표와 포트폴리오 관점</h2>
+          </div>
+          <div class="page-num">03 / 11</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>연구 목표</h3>
+    <ul>
+      <li>다양한 해상도의 IR array 데이터세트 구축</li>
+      <li>해상도 변화에 따른 인식 성능 정량 비교</li>
+      <li>단일 프레임 CNN과 연속 시퀀스 CNN-LSTM의 성능 차이 분석</li>
+      <li>저해상도 환경에서도 활용 가능한 HAR 구조 탐색</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>내가 보여줄 수 있는 역량</h3>
+    <ul>
+      <li>라즈베리파이 기반 센서 데이터 수집 시스템 이해</li>
+      <li>센서 데이터 전처리 및 학습 데이터 구성</li>
+      <li>딥러닝 모델 구조 이해 및 실험 결과 분석</li>
+      <li>실험 결과를 논문·발표자료 형태로 정리한 경험</li>
+    </ul>
+  </div>
+</div>
+<div class="card" style="margin-top:18px;">
+  <h3>핵심 질문</h3>
+  <p class="lead" style="font-size:20px; margin:0;">
+    “공간 해상도가 낮아져도, 시간 흐름을 함께 학습하면 HAR 성능을 안정적으로 유지할 수 있는가?”
+  </p>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Dataset</div>
+            <h2>Data C와 Data H 구성</h2>
+          </div>
+          <div class="page-num">04 / 11</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>Data C: 단일 프레임 기반 자세 인식</h3>
+    <table class="table">
+      <tr><th>항목</th><th>내용</th></tr>
+      <tr><td>데이터 유형</td><td>정적 IR 이미지</td></tr>
+      <tr><td>시계열 정보</td><td>없음</td></tr>
+      <tr><td>레이블 수</td><td>8개 자세</td></tr>
+      <tr><td>샘플 수</td><td>약 30,000장</td></tr>
+      <tr><td>적용 모델</td><td>CNN</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Data H: 연속 시퀀스 기반 동작 인식</h3>
+    <table class="table">
+      <tr><th>항목</th><th>내용</th></tr>
+      <tr><td>데이터 유형</td><td>연속 IR 시퀀스</td></tr>
+      <tr><td>시계열 정보</td><td>있음</td></tr>
+      <tr><td>레이블 수</td><td>15개 단일·이인 동작</td></tr>
+      <tr><td>샘플 수</td><td>450개 시퀀스</td></tr>
+      <tr><td>적용 모델</td><td>CNN-LSTM</td></tr>
+    </table>
+  </div>
+</div>
+<div class="metric-grid">
+  <div class="metric"><strong>32×24</strong><span>원본 해상도</span></div>
+  <div class="metric"><strong>16×12</strong><span>다운스케일</span></div>
+  <div class="metric"><strong>8×6</strong><span>극저해상도</span></div>
+  <div class="metric"><strong>8×8</strong><span>참고 조건</span></div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Model</div>
+            <h2>CNN과 CNN-LSTM 구조 비교</h2>
+          </div>
+          <div class="page-num">05 / 11</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>CNN: 단일 프레임의 공간 특징 학습</h3>
+    <ul>
+      <li>입력된 IR 이미지에서 열 분포와 형태 정보를 추출</li>
+      <li>Convolution, Pooling, Dense 계층을 거쳐 자세 분류</li>
+      <li>정적 자세 인식에는 강하지만 시간 흐름을 반영하지 못함</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>CNN-LSTM: 공간 특징 + 시간 흐름 학습</h3>
+    <ul>
+      <li>각 프레임은 CNN으로 공간 특징을 추출</li>
+      <li>LSTM은 프레임 간 변화와 동작 흐름을 학습</li>
+      <li>공간 정보가 줄어도 시계열 패턴으로 성능을 보완</li>
+    </ul>
+  </div>
+</div>
+<div class="flow">
+  <div class="flow-step"><h3>IR Frames</h3><p>저해상도 센서 입력</p></div>
+  <div class="flow-step"><h3>CNN</h3><p>공간 특징 추출</p></div>
+  <div class="flow-step"><h3>Flatten</h3><p>벡터화</p></div>
+  <div class="flow-step"><h3>LSTM</h3><p>시간 맥락 학습</p></div>
+  <div class="flow-step"><h3>Output</h3><p>동작 분류</p></div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Optimization</div>
+            <h2>Optuna 기반 하이퍼파라미터 최적화</h2>
+          </div>
+          <div class="page-num">06 / 11</div>
+        </div>
+        <div class="content">
+          
+<div class="card">
+  <h3>자동 탐색 방식</h3>
+  <p>
+    해상도별 모델 성능을 공정하게 비교하기 위해 Optuna를 활용해 필터 수, Dense 유닛 수,
+    dropout 비율, 학습률 등 주요 하이퍼파라미터를 탐색했습니다.
+  </p>
+</div>
+<div class="flow">
+  <div class="flow-step"><h3>Objective 정의</h3><p>모델 학습 후 성능 지표 반환</p></div>
+  <div class="flow-step"><h3>Trial 반복</h3><p>파라미터 조합 제안</p></div>
+  <div class="flow-step"><h3>성능 기반 탐색</h3><p>결과 기반 개선</p></div>
+  <div class="flow-step"><h3>Pruning</h3><p>낮은 성능 조기 중단</p></div>
+  <div class="flow-step"><h3>최적 조합</h3><p>가장 우수한 조합 선택</p></div>
+</div>
+<div class="metric-grid">
+  <div class="metric"><strong>Adam</strong><span>Optimizer</span></div>
+  <div class="metric"><strong>50</strong><span>Epochs</span></div>
+  <div class="metric"><strong>32</strong><span>Batch size</span></div>
+  <div class="metric"><strong>5회</strong><span>반복 학습</span></div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Result</div>
+            <h2>해상도별 인식 정확도 비교</h2>
+          </div>
+          <div class="page-num">07 / 11</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>CNN: Data C</h3>
+    <div class="result-bars">
+      <div class="bar-row"><span>32×24</span><div class="bar-track"><div class="bar-fill" style="--w:99.73%"></div></div><span>0.9973</span></div>
+      <div class="bar-row"><span>16×12</span><div class="bar-track"><div class="bar-fill" style="--w:98.93%"></div></div><span>0.9893</span></div>
+      <div class="bar-row"><span>8×6</span><div class="bar-track"><div class="bar-fill" style="--w:93.28%"></div></div><span>0.9328</span></div>
+      <div class="bar-row"><span>8×8</span><div class="bar-track"><div class="bar-fill" style="--w:96.85%"></div></div><span>0.9685</span></div>
+    </div>
+    <p style="margin-top:18px;">해상도가 낮아질수록 공간 특징 손실이 커져 정확도 하락이 뚜렷하게 나타났습니다.</p>
+  </div>
+  <div class="card">
+    <h3>CNN-LSTM: Data H</h3>
+    <div class="result-bars">
+      <div class="bar-row"><span>32×24</span><div class="bar-track"><div class="bar-fill" style="--w:98.45%"></div></div><span>0.9845</span></div>
+      <div class="bar-row"><span>16×12</span><div class="bar-track"><div class="bar-fill" style="--w:98.22%"></div></div><span>0.9822</span></div>
+      <div class="bar-row"><span>8×6</span><div class="bar-track"><div class="bar-fill" style="--w:97.56%"></div></div><span>0.9756</span></div>
+      <div class="bar-row"><span>8×8</span><div class="bar-track"><div class="bar-fill" style="--w:97.56%"></div></div><span>0.9756</span></div>
+    </div>
+    <p style="margin-top:18px;">연속 시퀀스 기반 모델은 해상도가 낮아져도 시간 흐름 정보를 활용해 비교적 안정적인 성능을 유지했습니다.</p>
+  </div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Insight</div>
+            <h2>핵심 결과: 시계열 구조의 강건성</h2>
+          </div>
+          <div class="page-num">08 / 11</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>CNN / 단일 프레임</h3>
+    <p class="lead" style="color:var(--red); font-size:42px; font-weight:900; margin:0 0 10px;">-6.46%</p>
+    <p>32×24에서 8×6으로 낮아질 때 정확도 하락폭이 컸습니다. 오답 증가폭은 약 25.2배로 나타났습니다.</p>
+  </div>
+  <div class="card">
+    <h3>CNN-LSTM / 연속 시퀀스</h3>
+    <p class="lead" style="color:var(--green); font-size:42px; font-weight:900; margin:0 0 10px;">-0.90%</p>
+    <p>같은 해상도 저하 조건에서 정확도 감소가 작았습니다. 오답 증가폭도 약 2.0배 수준으로 제한되었습니다.</p>
+  </div>
+</div>
+<div class="card" style="margin-top:18px;">
+  <h3>해석</h3>
+  <p class="lead" style="font-size:20px; margin:0;">저해상도 환경에서는 프레임 한 장의 공간 정보만 보는 것보다, 여러 프레임의 변화 흐름을 함께 학습하는 구조가 더 안정적으로 작동했습니다.</p>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">My Role</div>
+            <h2>프로젝트에서 수행한 역할</h2>
+          </div>
+          <div class="page-num">09 / 11</div>
+        </div>
+        <div class="content">
+          
+<div class="role-list">
+  <div class="role-item"><strong>1. 데이터 수집 시스템 구축 참여</strong><span>Raspberry Pi 기반 다중 IR 센서 제어와 동기화 데이터 수집 시스템 구축 과정에 참여했습니다.</span></div>
+  <div class="role-item"><strong>2. 학습 데이터 구성</strong><span>수집된 IR 데이터를 전처리하고, HAR 학습에 사용할 수 있도록 데이터셋을 구성했습니다.</span></div>
+  <div class="role-item"><strong>3. 모델 설계 및 학습 수행</strong><span>CNN-LSTM 기반 인간활동인식 모델 설계와 학습 과정에 참여했습니다.</span></div>
+  <div class="role-item"><strong>4. 성능 평가 및 결과 분석</strong><span>해상도별·모델별 성능을 비교하고, 저해상도 환경에서 시계열 구조가 갖는 장점을 분석했습니다.</span></div>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Portfolio Value</div>
+            <h2>직무와 연결되는 포인트</h2>
+          </div>
+          <div class="page-num">10 / 11</div>
+        </div>
+        <div class="content">
+          
+<div class="three-col">
+  <div class="card"><h3>센서 데이터 이해</h3><p>저해상도 IR 센서의 물리적 특성과 해상도 변화가 데이터 품질에 미치는 영향을 실험적으로 다뤘습니다.</p></div>
+  <div class="card"><h3>데이터 기반 문제 해결</h3><p>정확도 하락이라는 문제를 모델 구조와 시계열 정보 활용 관점에서 분석했습니다.</p></div>
+  <div class="card"><h3>제조·설비 데이터 확장성</h3><p>센서 기반 시계열 데이터 분석 경험은 설비 상태 모니터링, 이상 징후 탐지, 예방정비 관점으로 확장 가능합니다.</p></div>
+</div>
+<div class="card" style="margin-top:18px;">
+  <h3>한 줄 정리</h3>
+  <p class="lead" style="font-size:20px; margin:0;">센서 데이터 수집부터 전처리, 모델링, 성능 비교, 결과 해석까지 연결한 프로젝트입니다.</p>
+</div>
+
+        </div>
+      </article>
+    </section>
+    <section class="slide">
+      <article class="page">
+        <div class="page-header">
+          <div>
+            <div class="kicker">Conclusion</div>
+            <h2>결론 및 향후 개선 방향</h2>
+          </div>
+          <div class="page-num">11 / 11</div>
+        </div>
+        <div class="content">
+          
+<div class="two-col">
+  <div class="card">
+    <h3>결론</h3>
+    <ul>
+      <li>CNN은 해상도 감소에 따른 성능 저하가 상대적으로 크게 나타났습니다.</li>
+      <li>CNN-LSTM은 공간 정보 손실을 시계열 정보로 보완하며 안정적인 성능을 유지했습니다.</li>
+      <li>저해상도 IR 센서 기반 HAR은 사생활 보호가 중요한 환경에서 활용 가능성을 갖습니다.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>향후 연구</h3>
+    <ul>
+      <li>다양한 시계열 모델 구조 비교</li>
+      <li>해상도에 따른 정보 손실 정량화</li>
+      <li>저전력 환경에서의 경량화 모델 탐색</li>
+      <li>실제 응용 시나리오 기반 검증</li>
+    </ul>
+  </div>
+</div>
+
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="bottom">
+    <div class="progress-text" id="progressText">01 / 11</div>
+    <div class="dots" id="dots"></div>
+    <div class="hint">← / → 키 또는 좌우 버튼으로 이동</div>
+  </footer>
+
+  <script>
+const slides = Array.from(document.querySelectorAll(".slide"));
+const dotsWrap = document.getElementById("dots");
+const progressText = document.getElementById("progressText");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const printBtn = document.getElementById("printBtn");
+const backLink = document.getElementById("backLink");
+let current = 0;
+let wheelLocked = false;
+
+if (!location.pathname.includes("/projects/")) {
+  backLink.setAttribute("href", "index.html#projects");
+}
+
+slides.forEach((_, i) => {
+  const dot = document.createElement("button");
+  dot.className = "dot";
+  dot.setAttribute("aria-label", `${i + 1}번 페이지로 이동`);
+  dot.addEventListener("click", () => showSlide(i));
+  dotsWrap.appendChild(dot);
+});
+
+const dots = Array.from(document.querySelectorAll(".dot"));
+function pad(n) { return String(n).padStart(2, "0"); }
+
+function showSlide(index) {
+  if (index < 0) index = 0;
+  if (index >= slides.length) index = slides.length - 1;
+  slides[current].classList.remove("active");
+  dots[current].classList.remove("active");
+  current = index;
+  slides[current].classList.add("active");
+  dots[current].classList.add("active");
+  progressText.textContent = `${pad(current + 1)} / ${slides.length}`;
+  prevBtn.style.opacity = current === 0 ? ".35" : "1";
+  nextBtn.style.opacity = current === slides.length - 1 ? ".35" : "1";
+}
+function next() { showSlide(current + 1); }
+function prev() { showSlide(current - 1); }
+
+prevBtn.addEventListener("click", prev);
+nextBtn.addEventListener("click", next);
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") next();
+  if (e.key === "ArrowLeft" || e.key === "PageUp") prev();
+  if (e.key === "Home") showSlide(0);
+  if (e.key === "End") showSlide(slides.length - 1);
+});
+
+document.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  if (wheelLocked) return;
+  wheelLocked = true;
+  if (e.deltaY > 0) next();
+  if (e.deltaY < 0) prev();
+  setTimeout(() => wheelLocked = false, 520);
+}, { passive: false });
+
+printBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  window.print();
+});
+
+showSlide(0);
+</script>
+</body>
+</html>
