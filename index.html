@@ -223,8 +223,8 @@
     .visual-panel {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #101820;
-      color: #e7f8fb;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--ink);
       box-shadow: var(--shadow);
       overflow: hidden;
     }
@@ -235,7 +235,8 @@
       justify-content: space-between;
       gap: 16px;
       padding: 16px 18px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
     }
 
     .panel-title {
@@ -247,64 +248,94 @@
     .panel-status {
       padding: 6px 8px;
       border-radius: 8px;
-      color: #06351e;
-      background: #86efac;
+      color: #fff;
+      background: var(--primary);
       font-size: 12px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .panel-status:hover {
+      background: var(--primary-dark);
+    }
+
+    .profile-panel {
+      padding: 28px;
+    }
+
+    .profile-identity {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .profile-avatar {
+      display: grid;
+      flex: 0 0 auto;
+      width: 68px;
+      height: 68px;
+      place-items: center;
+      border-radius: 8px;
+      color: #fff;
+      background: var(--primary);
+      font-size: 22px;
       font-weight: 900;
     }
 
-    .signal-grid {
+    .profile-name {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 40px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .profile-role {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .profile-list {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: rgba(255, 255, 255, 0.08);
+      gap: 12px;
+      margin-top: 22px;
     }
 
-    .signal-cell {
-      min-height: 116px;
-      padding: 18px;
-      background: #121f29;
+    .profile-row {
+      display: grid;
+      grid-template-columns: 78px minmax(0, 1fr);
+      gap: 14px;
+      align-items: baseline;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--line);
     }
 
-    .signal-cell strong {
-      display: block;
-      margin-bottom: 16px;
-      color: #9fe7ee;
+    .profile-row:last-child {
+      border-bottom: 0;
+    }
+
+    .profile-label {
+      color: var(--primary-dark);
       font-size: 13px;
+      font-weight: 900;
     }
 
-    .bar {
-      display: block;
-      height: 8px;
-      margin-top: 10px;
-      border-radius: 8px;
-      background: linear-gradient(90deg, var(--primary), #8ee1eb);
+    .profile-value,
+    .profile-value a {
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.5;
+      text-decoration: none;
+      word-break: break-word;
     }
 
-    .bar.short {
-      width: 58%;
-    }
-
-    .bar.mid {
-      width: 74%;
-      background: linear-gradient(90deg, var(--accent), #f7a58e);
-    }
-
-    .bar.long {
-      width: 92%;
-      background: linear-gradient(90deg, var(--green), #9be7c4);
-    }
-
-    .terminal {
-      padding: 20px;
-      color: #b6c7d8;
-      font-family: "SFMono-Regular", Consolas, monospace;
-      font-size: 13px;
-      line-height: 1.8;
-    }
-
-    .terminal span {
-      color: #f7c873;
+    .profile-value a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
     }
 
     .section {
@@ -494,6 +525,50 @@
       padding: 24px;
     }
 
+    .timeline-item-featured {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(140px, 1fr);
+      gap: 24px;
+      align-items: center;
+    }
+
+    .timeline-cover-link {
+      display: block;
+      max-width: 180px;
+      margin-bottom: 18px;
+      margin-left: auto;
+      margin-right: auto;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-alt);
+    }
+
+    .timeline-item-featured .timeline-cover-link {
+      width: 100%;
+      margin: 0 0 0 auto;
+    }
+
+    .timeline-cover-link img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 400 / 514;
+      object-fit: cover;
+    }
+
+    .timeline-link {
+      display: inline-flex;
+      width: fit-content;
+      margin-top: 18px;
+      color: var(--primary-dark);
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .timeline-link:hover {
+      text-decoration: underline;
+    }
+
     .credential-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -503,38 +578,6 @@
     .credential {
       min-height: 152px;
       padding: 22px;
-    }
-
-    .contact {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 24px;
-      align-items: center;
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: clamp(28px, 5vw, 48px);
-      border-radius: 8px;
-      color: #fff;
-      background: #102027;
-      box-shadow: var(--shadow);
-    }
-
-    .contact h2 {
-      color: #fff;
-    }
-
-    .contact p {
-      max-width: 760px;
-      margin: 14px 0 0;
-      color: #c7d6de;
-      line-height: 1.7;
-    }
-
-    .contact-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: flex-end;
     }
 
     .footer {
@@ -548,10 +591,6 @@
 
     @media (max-width: 1040px) {
       .hero,
-      .contact {
-        grid-template-columns: 1fr;
-      }
-
       .metric-grid,
       .focus-grid,
       .project-grid,
@@ -602,8 +641,12 @@
         grid-template-columns: 1fr;
       }
 
-      .contact-actions {
-        justify-content: flex-start;
+      .timeline-item-featured {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline-item-featured .timeline-cover-link {
+        margin: 0 auto 18px;
       }
 
       .button {
@@ -627,10 +670,6 @@
         <a href="#credentials">자격</a>
       </nav>
 
-      <div class="top-actions">
-        <a class="button button-secondary" href="mailto:parkjuehwan@gmail.com">이메일</a>
-        <a class="button button-primary" href="#projects">프로젝트 보기</a>
-      </div>
     </header>
 
     <main>
@@ -645,10 +684,6 @@
             전기전자공학 기반 지식과 Python 데이터 분석 경험을 바탕으로 센서, 기상, 설비 데이터를 다룹니다.
             예측 모델링, 자동화, 리포팅까지 이어지는 실무형 데이터 워크플로를 설계하고 구현합니다.
           </p>
-          <div class="hero-actions">
-            <a class="button button-primary" href="#projects">대표 프로젝트 보기</a>
-            <a class="button button-secondary" href="https://github.com/parkjuehwan/portfolio" target="_blank" rel="noopener noreferrer">GitHub 열기</a>
-          </div>
           <ul class="hero-meta" aria-label="핵심 역량">
             <li>Machine Learning</li>
             <li>Predictive Maintenance</li>
@@ -657,35 +692,35 @@
           </ul>
         </div>
 
-        <div class="visual-panel" aria-label="데이터 분석 대시보드 시각 요소">
+        <div class="visual-panel" aria-label="간단한 프로필 정보">
           <div class="panel-top">
-            <p class="panel-title">Portfolio Signal Board</p>
-            <span class="panel-status">Ready</span>
+            <p class="panel-title">Profile</p>
+            <a class="panel-status" href="이력서_박주환.pdf" target="_blank" rel="noopener noreferrer">이력서</a>
           </div>
-          <div class="signal-grid">
-            <div class="signal-cell">
-              <strong>HAR Model</strong>
-              <span class="bar long"></span>
-              <span class="bar mid"></span>
-              <span class="bar short"></span>
+          <div class="profile-panel">
+            <div class="profile-identity">
+              <div class="profile-avatar" aria-hidden="true">JH</div>
+              <div>
+                <h2 class="profile-name">박주환</h2>
+                <p class="profile-role">Data-driven Engineering Portfolio</p>
+              </div>
             </div>
-            <div class="signal-cell">
-              <strong>RUL Forecast</strong>
-              <span class="bar mid"></span>
-              <span class="bar long"></span>
-              <span class="bar short"></span>
+            <div class="profile-list">
+              <div class="profile-row">
+                <span class="profile-label">학교</span>
+                <span class="profile-value">한국공학대학교</span>
+              </div>
+              <div class="profile-row">
+                <span class="profile-label">전공</span>
+                <span class="profile-value">전기전자공학</span>
+              </div>
+              <div class="profile-row">
+                <span class="profile-label">이메일</span>
+                <span class="profile-value">
+                  <a href="mailto:parkjuehwan@gmail.com">parkjuehwan@gmail.com</a>
+                </span>
+              </div>
             </div>
-            <div class="signal-cell">
-              <strong>Weather ML</strong>
-              <span class="bar short"></span>
-              <span class="bar mid"></span>
-              <span class="bar long"></span>
-            </div>
-          </div>
-          <div class="terminal">
-            <div><span>collect</span> sensor_data · weather_data · bms_logs</div>
-            <div><span>analyze</span> classification · regression · time_series</div>
-            <div><span>deliver</span> model_report · automation · insight</div>
           </div>
         </div>
       </section>
@@ -696,10 +731,6 @@
             <p class="section-kicker">About</p>
             <h2>공학 배경 위에 데이터 분석 역량을 쌓고 있습니다.</h2>
           </div>
-          <p class="section-lead">
-            전기전자공학 전공으로 회로, 신호, 시스템 기반을 학습했고, 프로젝트를 통해 데이터 수집부터 모델링,
-            결과 해석까지 연결하는 경험을 쌓았습니다.
-          </p>
         </div>
 
         <div class="metric-grid">
@@ -728,9 +759,6 @@
             <p class="section-kicker">Focus</p>
             <h2>제가 집중하는 문제</h2>
           </div>
-          <p class="section-lead">
-            단순히 모델을 만드는 데서 멈추지 않고, 데이터를 이해하고 설명 가능한 결과물로 정리하는 흐름을 중요하게 봅니다.
-          </p>
         </div>
 
         <div class="focus-grid">
@@ -758,15 +786,12 @@
             <p class="section-kicker">Projects</p>
             <h2>대표 프로젝트</h2>
           </div>
-          <p class="section-lead">
-            데이터 수집, 모델링, 분석 자동화까지 이어지는 프로젝트를 중심으로 정리했습니다.
-          </p>
         </div>
 
         <div class="project-grid">
           <article class="project-card">
             <div class="project-meta">2024.09 - 2025.07</div>
-            <h3>열화상 기반 인간 행동 인식</h3>
+            <h3>저해상도 IR센서 기반 인간 행동 인식</h3>
             <p>Raspberry Pi 기반 다중 IR 센서 데이터 수집 시스템을 구축하고 CNN-LSTM 기반 HAR 모델을 실험했습니다.</p>
             <div class="tags">
               <span class="tag">Raspberry Pi</span>
@@ -778,7 +803,7 @@
 
           <article class="project-card">
             <div class="project-meta">2025.08 - 2025.12</div>
-            <h3>웨더마루 서리 분류 ML 모델</h3>
+            <h3>날씨마루 서리 분류 ML 모델</h3>
             <p>기상 관측 데이터를 활용해 서리 발생 여부를 예측하는 분류 모델 교육 콘텐츠 제작에 참여했습니다.</p>
             <div class="tags">
               <span class="tag">Classification</span>
@@ -840,16 +865,19 @@
             <p class="section-kicker">Experience</p>
             <h2>경험</h2>
           </div>
-          <p class="section-lead">
-            분석, 교육 콘텐츠, 기술 문서, 연구 경험을 통해 데이터와 기술을 실제 결과물로 옮기는 감각을 키웠습니다.
-          </p>
         </div>
 
         <div class="timeline">
-          <article class="timeline-item">
-            <div class="timeline-date">2025.10 - 2026.04</div>
-            <h3>LLMOps 기술서 번역</h3>
-            <p>대규모 언어 모델 운영과 활용 관련 전문 기술서의 한국어 번역에 참여했습니다.</p>
+          <article class="timeline-item timeline-item-featured">
+            <div>
+              <div class="timeline-date">2025.10 - 2026.04</div>
+              <h3>LLMOps 기술서 번역</h3>
+              <p>대규모 언어 모델 운영과 활용 관련 전문 기술서의 한국어 번역에 참여했습니다.</p>
+              <a class="timeline-link" href="https://www.hanbit.co.kr/store/books/look.php?p_code=B2945285138" target="_blank" rel="noopener noreferrer">도서 페이지 보기</a>
+            </div>
+            <a class="timeline-cover-link" href="https://www.hanbit.co.kr/store/books/look.php?p_code=B2945285138" target="_blank" rel="noopener noreferrer" aria-label="LLMOps 기술서 도서 페이지 열기">
+              <img src="0beb52cc-b5ff-46ba-87bc-63980a638de2.png" alt="LLMOps 기술서 표지">
+            </a>
           </article>
           <article class="timeline-item">
             <div class="timeline-date">2025.08 - 2025.12</div>
@@ -916,21 +944,6 @@
         </div>
       </section>
 
-      <section class="section">
-        <div class="contact">
-          <div>
-            <p class="section-kicker">Contact</p>
-            <h2>데이터와 공학이 만나는 문제를 함께 해결하고 싶습니다.</h2>
-            <p>
-              포트폴리오의 프로젝트나 데이터 분석, AI 자동화 관련 협업 문의는 이메일 또는 GitHub를 통해 연락해 주세요.
-            </p>
-          </div>
-          <div class="contact-actions">
-            <a class="button button-primary" href="mailto:parkjuehwan@gmail.com">parkjuehwan@gmail.com</a>
-            <a class="button button-secondary" href="https://github.com/parkjuehwan/portfolio" target="_blank" rel="noopener noreferrer">GitHub</a>
-          </div>
-        </div>
-      </section>
     </main>
 
     <footer class="footer">
